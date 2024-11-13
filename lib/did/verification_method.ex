@@ -1,12 +1,12 @@
 defmodule DID.VerificationMethod do
   use Grax.Schema
-  import RDF.Sigils
+
+  alias DID.NS.Security
 
   schema DID.VerificationMethod do
-    # JSON
-    property :public_key_jwk, ~I<https://w3id.org/security#publicKeyJwk>, type: :string
+    # TODO: use rdf:JSON type
+    property :public_key_jwk, Security.publicKeyJwk(), type: :string
 
-    property :public_key_multibase, ~I<https://w3id.org/security#publicKeyMultibase>,
-      type: :string
+    property :public_key_multibase, Security.publicKeyMultibase(), type: :string
   end
 end

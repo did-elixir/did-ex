@@ -14,4 +14,18 @@ defmodule DID.NS do
     base_iri: "https://www.w3.org/ns/did#",
     file: "did.ttl",
     case_violations: :fail
+
+  @vocabdoc """
+  The Security Vocabulary.
+
+  See <https://w3id.org/security>
+  """
+  defvocab Security,
+    base_iri: "https://w3id.org/security#",
+    file: "security.ttl",
+    case_violations: :fail,
+    alias: [
+      CryptosuiteString: "cryptosuiteString",
+      Multibase: "multibase"
+    ]
 end
