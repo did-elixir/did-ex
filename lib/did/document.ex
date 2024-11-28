@@ -12,9 +12,7 @@ defmodule DID.Document do
              type: list_of(:iri)
 
     # TODO: type = :iri | list_of(:iri)
-    property :controller,
-             Security.controller(),
-             type: list_of(:iri)
+    property :controller, Security.controller()
 
     link verification_method: Security.verificationMethod(),
          type: list_of(DID.VerificationMethod)

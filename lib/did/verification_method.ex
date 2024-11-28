@@ -8,8 +8,8 @@ defmodule DID.VerificationMethod do
 
     property :controller, Security.controller(), type: :iri, required: true
 
-    # TODO: this is not formally defined in TTL files, how to proceed?
-    # property :type, ???, type: :string, required: true
+    # TODO: is RDF.type() correct here?
+    property :type, RDF.type(), type: :string, required: true
 
     # TODO: use rdf:JSON type
     property :public_key_jwk, Security.publicKeyJwk(), type: :string
