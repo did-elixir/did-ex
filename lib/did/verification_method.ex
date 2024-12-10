@@ -8,11 +8,9 @@ defmodule DID.VerificationMethod do
 
     property :controller, Security.controller(), type: :iri, required: true
 
-    # TODO: is RDF.type() correct here?
     property :type, RDF.type(), type: :string, required: true
 
-    # TODO: use rdf:JSON type
-    property :public_key_jwk, Security.publicKeyJwk(), type: :string
+    property :public_key_jwk, Security.publicKeyJwk(), type: :json
 
     property :public_key_multibase, Security.publicKeyMultibase(), type: :string
   end

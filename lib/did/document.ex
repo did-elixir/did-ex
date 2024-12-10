@@ -11,31 +11,30 @@ defmodule DID.Document do
              ~I<https://www.w3.org/ns/activitystreams#alsoKnownAs>,
              type: list_of(:iri)
 
-    # TODO: type = :iri | list_of(:iri)
-    property :controller, Security.controller()
+    property :controller, Security.controller(), type: list_of(:iri)
 
     link verification_method: Security.verificationMethod(),
          type: list_of(DID.VerificationMethod)
 
-    # TODO: type = list_of(:iri | :json)
     link authentication: Security.authentication(),
-         type: list_of(DID.VerificationMethod)
+         type: list_of(DID.VerificationMethod),
+         on_missing_description: :use_rdf_node
 
-    # TODO: type = list_of(:iri | :json)
     link assertion_method: Security.assertionMethod(),
-         type: list_of(DID.VerificationMethod)
+         type: list_of(DID.VerificationMethod),
+         on_missing_description: :use_rdf_node
 
-    # TODO: type = list_of(:iri | :json)
     link key_agreement: Security.keyAgreementMethod(),
-         type: list_of(DID.VerificationMethod)
+         type: list_of(DID.VerificationMethod),
+         on_missing_description: :use_rdf_node
 
-    # TODO: type = list_of(:iri | :json)
     link capability_invocation: Security.capabilityInvocationMethod(),
-         type: list_of(DID.VerificationMethod)
+         type: list_of(DID.VerificationMethod),
+         on_missing_description: :use_rdf_node
 
-    # TODO: type = list_of(:iri | :json)
     link capability_delegation: Security.capabilityDelegationMethod(),
-         type: list_of(DID.VerificationMethod)
+         type: list_of(DID.VerificationMethod),
+         on_missing_description: :use_rdf_node
 
     link service: DID.service(), type: list_of(DID.Service)
   end

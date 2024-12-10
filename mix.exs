@@ -20,8 +20,10 @@ defmodule DID.MixProject do
 
   defp deps do
     [
-      {:rdf, "~> 2.0"},
-      {:grax, "~> 0.5"}
+      # TODO: change to release versions
+      {:rdf, github: ~c"rdf-elixir/rdf-ex", override: true},
+      {:grax, github: ~c"rdf-elixir/grax"},
+      {:json_ld, "~> 0.3"}
     ]
   end
 
