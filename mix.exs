@@ -20,11 +20,17 @@ defmodule DID.MixProject do
 
   defp deps do
     [
-      # TODO: change to release versions
-      {:rdf, github: ~c"rdf-elixir/rdf-ex", override: true},
-      {:grax, github: ~c"rdf-elixir/grax"},
-      {:json_ld, "~> 0.3"}
+      rdf_ex_dep(:rdf, "~> 2.1"),
+      rdf_ex_dep(:grax, "~> 0.6"),
+      rdf_ex_dep(:json_ld, "~> 1.0")
     ]
+  end
+
+  defp rdf_ex_dep(dep, version) do
+    case System.get_env("RDF_EX_PACKAGES_SRC") do
+      "LOCAL" -> {dep, path: "../../../RDF.ex/src/#{dep}"}
+      _ -> {dep, version}
+    end
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
