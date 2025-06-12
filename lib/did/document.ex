@@ -61,18 +61,15 @@ defmodule DID.Document do
             Map.get(node, "id") == to_string(document.__id__)
           end)
 
-        # Find all verification method nodes
-        vm_nodes =
-          Enum.filter(nodes, fn node ->
-            Map.has_key?(node, "publicKeyMultibase")
-          end)
-
-        # Create a map of VM nodes by ID for easy lookup
-        vm_map = Map.new(vm_nodes, fn vm -> {vm["id"], vm} end)
+        # Create a map of all non-main nodes by ID for embedding
+        resource_map =
+          nodes
+          |> Enum.reject(fn node -> node == did_doc end)
+          |> Map.new(fn node -> {node["id"], node} end)
 
         # Transform the document
         did_doc
-        |> embed_verification_methods(vm_map)
+        |> embed_linked_resources(resource_map)
         |> transform_authentication()
         |> Map.put("@context", json_ld["@context"])
 
@@ -83,25 +80,31 @@ defmodule DID.Document do
     end
   end
 
-  defp embed_verification_methods(doc, vm_map) do
-    # Properties that should embed full verification methods
-    embed_properties = ["verificationMethod", "keyAgreement"]
+  @embedded_properties ["verificationMethod", "keyAgreement", "service"]
+  defp embed_linked_resources(doc, resource_map) do
+    Enum.reduce(doc, %{}, fn {key, value}, acc ->
+      case {key, value} do
+        # Skip @context and other metadata
+        {"@" <> _, _} ->
+          Map.put(acc, key, value)
 
-    Enum.reduce(embed_properties, doc, fn prop, acc ->
-      case Map.get(acc, prop) do
-        refs when is_list(refs) ->
-          embedded_vms = Enum.map(refs, fn ref -> Map.get(vm_map, ref, ref) end)
-          Map.put(acc, prop, embedded_vms)
+        # Handle references for embeddable properties
+        {key, refs} when key in @embedded_properties ->
+          embedded = refs |> List.wrap() |> Enum.map(&embed_if_available(&1, resource_map))
+          Map.put(acc, key, embedded)
 
-        ref when is_binary(ref) ->
-          embedded_vm = Map.get(vm_map, ref, ref)
-          Map.put(acc, prop, [embedded_vm])
-
-        nil ->
-          acc
+        # Keep other values as-is
+        {_, _} ->
+          Map.put(acc, key, value)
       end
     end)
   end
+
+  defp embed_if_available(ref, resource_map) when is_binary(ref) do
+    Map.get(resource_map, ref, ref)
+  end
+
+  defp embed_if_available(ref, _), do: ref
 
   defp transform_authentication(doc) do
     case Map.get(doc, "https://w3id.org/security#authentication") do
