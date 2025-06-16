@@ -121,6 +121,10 @@ defmodule DID.Document do
     end
   end
 
+  def to_rdf(document) do
+    Grax.to_rdf!(document) |> RDF.Dataset.new()
+  end
+
   # TODO: use RDF typing opt-out of Grax when available instead of this hack
   def on_to_rdf(%__MODULE__{__id__: id}, graph, _opts) do
     {

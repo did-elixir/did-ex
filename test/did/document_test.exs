@@ -43,8 +43,7 @@ defmodule DID.DocumentTest do
                     )
 
   test "to_rdf/1" do
-    assert Grax.to_rdf!(@example_document) |> RDF.Dataset.new() ==
-             JSON.LD.read_string!(@example_json_ld)
+    assert DID.Document.to_rdf(@example_document) == JSON.LD.read_string!(@example_json_ld)
   end
 
   test "to_json_ld/2" do
