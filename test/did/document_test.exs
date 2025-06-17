@@ -7,6 +7,7 @@ defmodule DID.DocumentTest do
   alias DID.NS.Security
 
   @example_json_ld File.read!("test/fixtures/did-key.jsonld")
+  @example_json_ld_missing_required File.read!("test/fixtures/did-key-missing-required.jsonld")
 
   @example_document DID.Document.build!(
                       ~I<did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK>,
@@ -20,16 +21,40 @@ defmodule DID.DocumentTest do
                         )
                       ],
                       authentication: [
-                        ~I<did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK#z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK>
+                        DID.VerificationMethod.build!(
+                          ~I<did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK#z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK>,
+                          type: RDF.iri(Security.Ed25519VerificationKey2020),
+                          controller:
+                            ~I<did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK>,
+                          public_key_multibase: "z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"
+                        )
                       ],
                       assertion_method: [
-                        ~I<did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK#z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK>
+                        DID.VerificationMethod.build!(
+                          ~I<did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK#z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK>,
+                          type: RDF.iri(Security.Ed25519VerificationKey2020),
+                          controller:
+                            ~I<did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK>,
+                          public_key_multibase: "z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"
+                        )
                       ],
                       capability_delegation: [
-                        ~I<did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK#z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK>
+                        DID.VerificationMethod.build!(
+                          ~I<did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK#z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK>,
+                          type: RDF.iri(Security.Ed25519VerificationKey2020),
+                          controller:
+                            ~I<did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK>,
+                          public_key_multibase: "z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"
+                        )
                       ],
                       capability_invocation: [
-                        ~I<did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK#z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK>
+                        DID.VerificationMethod.build!(
+                          ~I<did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK#z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK>,
+                          type: RDF.iri(Security.Ed25519VerificationKey2020),
+                          controller:
+                            ~I<did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK>,
+                          public_key_multibase: "z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"
+                        )
                       ],
                       key_agreement: [
                         DID.VerificationMethod.build!(
@@ -57,5 +82,30 @@ defmodule DID.DocumentTest do
              )
 
     assert Jason.decode!(result) == Jason.decode!(@example_json_ld)
+  end
+
+  describe "from_json_ld/1" do
+    test "with valid document" do
+      assert {:ok, result} = DID.Document.from_json_ld(@example_json_ld)
+      assert @example_document == result
+    end
+
+    test "with invalid JSON" do
+      assert {:error, %Jason.DecodeError{}} = DID.Document.from_json_ld("{")
+    end
+
+    test "with missing ID" do
+      assert {:error, :missing_id} = DID.Document.from_json_ld("{}")
+    end
+
+    test "with invalid IRI" do
+      assert {:error, :invalid_iri} = DID.Document.from_json_ld("{\"id\": 1337}")
+    end
+
+    test "without required fields" do
+      assert {:error,
+              %Grax.ValidationError{errors: [controller: %Grax.Schema.CardinalityError{}]}} =
+               DID.Document.from_json_ld(@example_json_ld_missing_required)
+    end
   end
 end

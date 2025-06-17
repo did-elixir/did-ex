@@ -121,6 +121,30 @@ defmodule DID.Document do
     end
   end
 
+  def from_json_ld(json_ld) do
+    with {:ok, json_data} <- Jason.decode(json_ld),
+         {:ok, did_id} <- fetch_did_id(json_data),
+         {:ok, iri} <- make_iri(did_id),
+         {:ok, rdf_dataset} <- JSON.LD.read_string(json_ld),
+         rdf_graph = RDF.Dataset.default_graph(rdf_dataset),
+         do: Grax.load(rdf_graph, iri, __MODULE__, depth: 1)
+  end
+
+  defp fetch_did_id(json_data) do
+    case Map.fetch(json_data, "id") do
+      :error -> {:error, :missing_id}
+      result -> result
+    end
+  end
+
+  defp make_iri(value) when is_binary(value) do
+    {:ok, RDF.iri(value)}
+  end
+
+  defp make_iri(_value) do
+    {:error, :invalid_iri}
+  end
+
   def to_rdf(document) do
     Grax.to_rdf!(document) |> RDF.Dataset.new()
   end
