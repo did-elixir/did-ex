@@ -68,7 +68,9 @@ defmodule DID.DocumentTest do
                     )
 
   test "to_rdf/1" do
-    assert DID.Document.to_rdf(@example_document) == JSON.LD.read_string!(@example_json_ld)
+    assert DID.Document.to_rdf(@example_document) ==
+             JSON.LD.read_string!(@example_json_ld)
+             |> RDF.Dataset.default_graph()
   end
 
   test "to_json_ld/2" do

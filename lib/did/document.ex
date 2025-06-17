@@ -146,7 +146,7 @@ defmodule DID.Document do
   end
 
   def to_rdf(document) do
-    Grax.to_rdf!(document) |> RDF.Dataset.new()
+    Grax.to_rdf!(document)
   end
 
   # TODO: use RDF typing opt-out of Grax when available instead of this hack
