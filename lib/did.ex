@@ -3,16 +3,6 @@ defmodule DID do
   Documentation for `DID`.
   """
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> DID.hello()
-      :world
-
-  """
-  def hello do
-    :world
-  end
+  import RDF.Namespace
+  act_as_namespace DID.NS.DID
 end
